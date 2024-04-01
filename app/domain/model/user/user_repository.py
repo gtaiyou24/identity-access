@@ -1,0 +1,15 @@
+from __future__ import annotations
+
+import abc
+
+from domain.model.user import User, EmailAddress
+
+
+class UserRepository(abc.ABC):
+    @abc.abstractmethod
+    def add(self, user: User) -> None:
+        pass
+
+    @abc.abstractmethod
+    def user_with_email_address(self, email_address: EmailAddress) -> User | None:
+        pass

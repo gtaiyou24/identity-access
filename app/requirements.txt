@@ -9,3 +9,7 @@ python-jose[cryptography]==3.3.0
 # Original
 di4injector==0.0.1
 slf4py==0.0.2
+
+# MySQL
+sqlalchemy==2.0.29
+mysqlclient==2.2.1

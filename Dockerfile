@@ -9,6 +9,7 @@ WORKDIR $project_dir
 
 # ライブラリをインストール
 RUN apt-get update -y \
+    && apt-get install -y default-libmysqlclient-dev pkg-config build-essential \
     && apt-get clean && rm -rf /var/lib/apt/lists/* \
     && pip install --upgrade pip \
     && pip install --no-cache-dir -r requirements.txt

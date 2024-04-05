@@ -28,6 +28,7 @@ class ErrorLevel(Enum):
 
 class ErrorCode(Enum):
     LOGIN_BAD_CREDENTIALS = ('メールアドレスまたはパスワードが間違っています', ErrorLevel.WARN, HTTPStatus.UNAUTHORIZED)
+    REGISTER_USER_ALREADY_EXISTS = ('該当メールアドレスですでにユーザー登録されています', ErrorLevel.WARN, HTTPStatus.BAD_REQUEST)
     COMMON_2001 = ('アクセス拒否', ErrorLevel.WARN, HTTPStatus.FORBIDDEN)
     COMMON_2011 = ('該当ユーザーが見つかりません', ErrorLevel.WARN, HTTPStatus.NOT_FOUND)
 

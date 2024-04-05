@@ -48,6 +48,8 @@ class IdentityApplicationService:
             command.plain_password,
             FullName(command.first_name, command.last_name)
         )
+        if self.__user_repository.user_with_email_address(user.email_address):
+            raise SystemException(ErrorCode.REGISTER_USER_ALREADY_EXISTS, 'ユーザー登録に失敗しました。')
         self.__user_repository.add(user)
         return UserDpo(user)
 

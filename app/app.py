@@ -5,6 +5,7 @@ from di import DI, DIContainer
 from fastapi import FastAPI, Request
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy import Engine, create_engine
+from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 
 from application import UnitOfWork
@@ -47,6 +48,14 @@ async def lifespan(app: FastAPI):
     # 終了後
 
 app = FastAPI(title='Identity Access', root_path=os.getenv('OPENAPI_PREFIX'), lifespan=lifespan)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
 
 app.include_router(auth_resource.router)
 app.include_router(health_resource.router)

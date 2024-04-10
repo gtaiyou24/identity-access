@@ -1,6 +1,9 @@
 # Identity Access
 ユーザーに対するロールベースのセキュアなアクセス管理機能を提供するサービス
 
+ - メール配信 : [SendGrid](https://sendgrid.kke.co.jp/)
+ - 決済 : [Stripe](https://stripe.com/jp)
+
 ## Domain
 
 | ユビキタス言語 | 説明                                                                                                             |

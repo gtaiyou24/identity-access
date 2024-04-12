@@ -34,8 +34,6 @@ def register_user(request: RegisterUserRequest):
     application_service = DIContainer.instance().resolve(IdentityApplicationService)
     dpo = application_service.register_user(RegisterUserCommand(
         request.email_address,
-        request.password,
-        request.first_name,
-        request.last_name
+        request.password
     ))
     return UserJson.from_(dpo)

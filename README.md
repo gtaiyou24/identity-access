@@ -21,3 +21,4 @@ docker-compose up --build
 
  - https://fastapi.tiangolo.com/ja/tutorial/security/oauth2-jwt/
  - https://github.com/VaughnVernon/IDDD_Samples/tree/master/iddd_identityaccess
+ - https://github.com/hafizn07/next-auth-v5-advanced-guide-2024/tree/main

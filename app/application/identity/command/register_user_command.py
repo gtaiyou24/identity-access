@@ -5,5 +5,3 @@ from dataclasses import dataclass
 class RegisterUserCommand:
     email_address: str
     plain_password: str
-    first_name: str
-    last_name: str

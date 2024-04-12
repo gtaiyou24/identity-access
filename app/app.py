@@ -9,13 +9,17 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 
 from application import UnitOfWork
+from domain.model.mail import MailDeliveryService
 from domain.model.user import UserRepository, EncryptionService
 from exception import SystemException
-from port.adapter.persistence.repository.inmem import InMemUserRepository, InMemUnitOfWork
+from port.adapter.persistence.repository.inmem import InMemUnitOfWork, InMemUserRepository
 from port.adapter.persistence.repository.mysql import DataBase, MySQLUnitOfWork
 from port.adapter.resource.auth import auth_resource
 from port.adapter.resource.health import health_resource
 from port.adapter.resource.user import user_resource
+from port.adapter.service.mail import MailDeliveryServiceImpl
+from port.adapter.service.mail.adapter import MailDeliveryAdapter
+from port.adapter.service.mail.adapter.mailhog import MailHogAdapter
 from port.adapter.service.user import EncryptionServiceImpl
 
 
@@ -26,20 +30,12 @@ async def lifespan(app: FastAPI):
         DI.of(UnitOfWork, {'MySQL': MySQLUnitOfWork}, InMemUnitOfWork),
         DI.of(UserRepository, {}, InMemUserRepository),
         DI.of(EncryptionService, {}, EncryptionServiceImpl),
+        DI.of(MailDeliveryService, {}, MailDeliveryServiceImpl),
+        DI.of(MailDeliveryAdapter, {}, MailHogAdapter),
     ]
 
     if 'MySQL' in os.getenv('DI_PROFILE_ACTIVES'):
-        engine: Engine = create_engine(
-            'mysql://{username}:{password}@{host}:{port}/{database}?{options}'.format(
-                username=os.getenv('DATABASE_USERNAME'),
-                password=os.getenv('DATABASE_PASSWORD'),
-                host=os.getenv('DATABASE_HOST'),
-                port=3306,
-                database=os.getenv('DATABASE'),
-                options='charset=utf8mb4' if os.getenv('MODE') == 'local' else 'ssl_mode=VERIFY_IDENTITY&charset=utf8mb4'
-            ),
-            echo=os.getenv('LOG_LEVEL', 'DEBUG') == 'DEBUG'
-        )
+        engine: Engine = create_engine(os.getenv('DATABASE_URL'), echo=os.getenv('LOG_LEVEL', 'DEBUG') == 'DEBUG')
         DI_LIST.append(DI.of(Engine, {}, engine))
         DataBase.metadata.create_all(bind=engine)
 

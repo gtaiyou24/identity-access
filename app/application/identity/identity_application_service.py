@@ -1,12 +1,16 @@
 from __future__ import annotations
 
+import datetime
+import uuid
+
 from injector import singleton, inject
 
 from application import ApplicationServiceLifeCycle
 from application.identity.command import ProvisionTenantCommand, RegisterUserCommand, AuthenticateUserCommand
 from application.identity.dpo import UserDpo
+from domain.model.mail import MailDeliveryService
 from domain.model.tenant import Tenant
-from domain.model.user import UserRepository, User, FullName, EmailAddress
+from domain.model.user import UserRepository, User, EmailAddress
 from exception import SystemException, ErrorCode
 
 
@@ -15,9 +19,11 @@ class IdentityApplicationService:
     @inject
     def __init__(self,
                  application_service_life_cycle: ApplicationServiceLifeCycle,
-                 user_repository: UserRepository):
+                 user_repository: UserRepository,
+                 mail_delivery_service: MailDeliveryService):
         self.__application_service_life_cycle = application_service_life_cycle
         self.__user_repository = user_repository
+        self.__mail_delivery_service = mail_delivery_service
 
     def provision_tenant(self, command: ProvisionTenantCommand):
         """テナントを作成する"""
@@ -46,11 +52,16 @@ class IdentityApplicationService:
         user = User.new(
             EmailAddress(command.email_address),
             command.plain_password,
-            FullName(command.first_name, command.last_name)
         )
         if self.__user_repository.user_with_email_address(user.email_address):
             raise SystemException(ErrorCode.REGISTER_USER_ALREADY_EXISTS, 'ユーザー登録に失敗しました。')
+
         self.__user_repository.add(user)
+
+        verification_token = uuid.uuid4()
+        expires = datetime.datetime.now() + datetime.timedelta(minutes=10)
+        self.__mail_delivery_service.send(user.email_address, '【Epic Bot】メールアドレスの検証', """Hi there""")
+
         return UserDpo(user)
 
     def authenticate_user(self, command: AuthenticateUserCommand) -> UserDpo | None:

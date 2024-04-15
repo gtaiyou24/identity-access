@@ -2,15 +2,10 @@ from __future__ import annotations
 
 from datetime import timedelta, datetime, timezone
 
-from jose import jwt
 from pydantic import BaseModel
 
 from application.identity.dpo import UserDpo
-from port.adapter.resource.auth import JWT
-
-# to get a string like this run:
-# openssl rand -hex 32
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+from port.adapter.resource.auth import JWTEncoder
 
 
 class Token(BaseModel):
@@ -20,9 +15,9 @@ class Token(BaseModel):
 
     @staticmethod
     def generate(dpo: UserDpo) -> Token:
-        expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-        access_token = JWT.encode({
+        now = datetime.now(timezone.utc)
+        access_token = JWTEncoder.encode({
             "sub": dpo.user.email_address.address,
-            'exp': expire
+            'exp': now + timedelta(minutes=30)
         })
         return Token(access_token=access_token, token_type="bearer")

@@ -4,11 +4,13 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError
 
 from application.identity import IdentityApplicationService
-from application.identity.command import AuthenticateUserCommand
+from application.identity.command import AuthenticateUserCommand, RegisterUserCommand, ForgotPasswordCommand, \
+    ResetPasswordCommand
 from domain.model.user import User
-from port.adapter.resource.auth import JWT
-from port.adapter.resource.auth.request import OAuth2PasswordRequest, ResetPasswordRequest, VerifyRequest
-from port.adapter.resource.auth.response import Token
+from port.adapter.resource.auth import JWTEncoder
+from port.adapter.resource.auth.request import OAuth2PasswordRequest, ResetPasswordRequest, VerifyRequest, \
+    RegisterUserRequest, ForgotPasswordRequest
+from port.adapter.resource.auth.response import Token, UserDescriptorJson
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
@@ -25,7 +27,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload = JWT.decode(token)
+        payload = JWTEncoder.decode(token)
         email_address: str = payload.get("sub")
         if email_address is None:
             raise credentials_exception
@@ -44,8 +46,24 @@ async def get_current_active_user(current_user: User = Depends(get_current_user)
     return current_user
 
 
-@router.post("/token")
-def token(request: OAuth2PasswordRequest = Depends()) -> Token:
+@router.post("/user/register", response_model=UserDescriptorJson)
+def register_user(request: RegisterUserRequest):
+    application_service = DIContainer.instance().resolve(IdentityApplicationService)
+    dpo = application_service.register_user(RegisterUserCommand(
+        request.email_address,
+        request.password
+    ))
+    return UserDescriptorJson.from_(dpo)
+
+
+@router.post("/verify-email/{token}")
+def verify_email(token: str):
+    application_service = DIContainer.instance().resolve(IdentityApplicationService)
+    application_service.verify_email(token)
+
+
+@router.post("/token", response_model=Token)
+def token(request: OAuth2PasswordRequest) -> Token:
     application_service = DIContainer.instance().resolve(IdentityApplicationService)
     dpo = application_service.authenticate_user(AuthenticateUserCommand(request.email_address, request.password))
     return Token.generate(dpo)
@@ -71,10 +89,12 @@ def verify(request: VerifyRequest):
 
 
 @router.post("/forgot-password")
-def forgot_password() -> None:
-    return None
+def forgot_password(request: ForgotPasswordRequest):
+    application_service = DIContainer.instance().resolve(IdentityApplicationService)
+    application_service.forgot_password(ForgotPasswordCommand(request.email_address))
 
 
 @router.post("/reset-password")
-def reset_password(request: ResetPasswordRequest) -> None:
-    return None
+def reset_password(request: ResetPasswordRequest):
+    application_service = DIContainer.instance().resolve(IdentityApplicationService)
+    application_service.reset_password(ResetPasswordCommand(request.token, request.password))

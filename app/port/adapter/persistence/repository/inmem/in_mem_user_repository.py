@@ -15,3 +15,9 @@ class InMemUserRepository(UserRepository):
             if user.email_address == email_address:
                 return user
         return None
+
+    def user_with_token(self, value: str) -> User | None:
+        for user in self.users:
+            if user.token_with(value) is not None:
+                return user
+        return None

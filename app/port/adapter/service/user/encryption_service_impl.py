@@ -10,5 +10,5 @@ class EncryptionServiceImpl(EncryptionService):
     def encrypt(self, plain_value: str) -> str:
         return self.__pwd_context.hash(plain_value)
 
-    def verify(self, plain_value, hashed_value) -> bool:
+    def verify(self, plain_value: str, hashed_value: str) -> bool:
         return self.__pwd_context.verify(plain_value, hashed_value)

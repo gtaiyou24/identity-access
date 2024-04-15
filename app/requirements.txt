@@ -13,3 +13,6 @@ slf4py==0.0.2
 # MySQL
 sqlalchemy==2.0.29
 mysqlclient==2.2.1
+
+# Mail
+html2text==2024.2.26

@@ -1,17 +1,26 @@
 import smtplib
+from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+
+from html2text import html2text
 
 from domain.model.user import EmailAddress
 from port.adapter.service.mail.adapter import MailDeliveryAdapter
 
 
 class MailHogAdapter(MailDeliveryAdapter):
-    def send(self, to: EmailAddress, subject: str, message: str) -> None:
-        mail = MIMEText(message, 'html')
+    _FROM = 'hello@epic-bot.com'
+
+    def __init__(self):
+        self.__smtp = smtplib.SMTP(host="mailhog", port=1025)
+
+    def send(self, to: EmailAddress, subject: str, html: str) -> None:
+        mail = MIMEMultipart('alternative')
         mail['Subject'] = subject
-        mail['From'] = 'hello@epic-bot.com'
+        mail['From'] = self._FROM
         mail['To'] = to.address
 
-        smtp = smtplib.SMTP(host="mailhog", port=1025)
-        smtp.sendmail('hello@epic-bot.com', to.address, mail.as_string())
-        smtp.close()
+        mail.attach(MIMEText(html2text(html), 'plain'))
+        mail.attach(MIMEText(html, 'html'))
+
+        self.__smtp.sendmail(self._FROM, to.address, mail.as_string())

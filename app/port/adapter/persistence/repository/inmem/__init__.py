@@ -1,2 +1,3 @@
+from .in_mem_token_repository import InMemTokenRepository
 from .in_mem_user_repository import InMemUserRepository
 from .in_mem_unit_of_work import InMemUnitOfWork

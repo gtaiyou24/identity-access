@@ -3,6 +3,7 @@ from typing import Optional
 from injector import singleton, inject
 
 from application import UnitOfWork
+from domain.model import DomainEventSubscriber, DomainEvent, DomainEventPublisher
 
 
 @singleton
@@ -24,5 +25,16 @@ class ApplicationServiceLifeCycle:
     def success(self) -> None:
         self.__unit_of_work.commit()
 
-    def listen(self) -> None:
-        pass
+    def listen(self):
+        class DomainEventSubscriberImpl(DomainEventSubscriber):
+            event_store = []
+
+            def handle_event(self, domain_event: DomainEvent):
+                self.event_store.append(domain_event)
+
+            def subscribed_to_event_type(self) -> type:
+                # 全てのドメインイベント
+                return DomainEvent.__class__
+
+        DomainEventPublisher.shared().reset()
+        DomainEventPublisher.shared().subscribe(DomainEventSubscriberImpl[DomainEvent]())

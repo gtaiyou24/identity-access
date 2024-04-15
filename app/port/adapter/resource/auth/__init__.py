@@ -1,2 +1,2 @@
-from .jwt import JWT
+from .jwt import JWTEncoder
 from .jwt import JWTBearer

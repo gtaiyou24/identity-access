@@ -46,6 +46,7 @@ services:
   # Mail Server
   mailhog:
     image: mailhog/mailhog
+    container_name: identity-access-mailhog
     ports:
       - "8025:8025"
 

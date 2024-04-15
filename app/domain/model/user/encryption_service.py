@@ -7,5 +7,5 @@ class EncryptionService(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def verify(self, plain_value, hashed_value) -> bool:
+    def verify(self, plain_value: str, hashed_value: str) -> bool:
         pass

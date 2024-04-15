@@ -1,6 +1,5 @@
 from pydantic import BaseModel, Field
 
 
-class OAuth2PasswordRequest(BaseModel):
+class ForgotPasswordRequest(BaseModel):
     email_address: str = Field(title='メールアドレス')
-    password: str = Field(title='パスワード')

@@ -11,11 +11,14 @@
 | テナント | テナント（tenant）は、本来は賃貸人のことだが、IT分野ではシステムやサービスの利用範囲を定義する言葉で、**ユーザーの契約単位**を指す。 |
 
 ## How To
-### Run
+### Start
 
 ```bash
 docker-compose up --build
 ```
+
+ - [Swagger UI](http://localhost:8000/docs)
+ - [MailHog](http://0.0.0.0:8025/)
 
 ## 🔗APPENDIX
 

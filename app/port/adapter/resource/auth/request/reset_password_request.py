@@ -2,5 +2,5 @@ from pydantic import BaseModel, Field
 
 
 class ResetPasswordRequest(BaseModel):
-    email_address: str = Field(title="メールアドレス")
+    token: str = Field(title="パスワードリセットトークン")
     password: str = Field(title="パスワード")

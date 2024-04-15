@@ -5,16 +5,16 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jose import jwt
 
 
-class JWT:
+class JWTEncoder:
     ALGORITHM = 'HS256'
 
     @staticmethod
     def encode(payload: dict) -> str:
-        return jwt.encode(payload, os.getenv('JWT_SECRET_KEY'), algorithm=JWT.ALGORITHM)
+        return jwt.encode(payload, os.getenv('JWT_SECRET_KEY'), algorithm=JWTEncoder.ALGORITHM)
 
     @staticmethod
     def decode(token: str) -> dict:
-        payload = jwt.decode(token, os.getenv('JWT_SECRET_KEY'), algorithms=[JWT.ALGORITHM])
+        payload = jwt.decode(token, os.getenv('JWT_SECRET_KEY'), algorithms=[JWTEncoder.ALGORITHM])
         return payload
 
 

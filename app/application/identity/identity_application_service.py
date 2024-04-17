@@ -7,7 +7,7 @@ from injector import singleton, inject
 
 from application import ApplicationServiceLifeCycle
 from application.identity.command import ProvisionTenantCommand, RegisterUserCommand, AuthenticateUserCommand, \
-    ForgotPasswordCommand, ResetPasswordCommand
+    ForgotPasswordCommand, ResetPasswordCommand, AuthenticateProviderUserCommand
 from application.identity.dpo import UserDpo
 from domain.model.mail import MailDeliveryService
 from domain.model.tenant import Tenant
@@ -112,7 +112,20 @@ class IdentityApplicationService:
                 </html>
                 '''
             )
+            return None
 
+        return UserDpo(user)
+
+    def authenticate_provider_user(self, command: AuthenticateProviderUserCommand) -> UserDpo:
+        email_address = EmailAddress(command.email_address)
+        user = self.__user_repository.user_with_email_address(email_address)
+
+        if user is not None:
+            # すでにユーザーが存在する場合は、認証完了とする
+            return UserDpo(user)
+
+        user = User.registered(email_address, None)
+        self.__user_repository.add(user)
         return UserDpo(user)
 
     def user(self, email_address: str) -> UserDpo | None:

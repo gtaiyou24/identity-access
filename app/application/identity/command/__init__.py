@@ -1,3 +1,4 @@
+from .authenticate_provider_user_command import AuthenticateProviderUserCommand
 from .authenticate_user_command import AuthenticateUserCommand
 from .forgot_password_command import ForgotPasswordCommand
 from .provision_tenant_command import ProvisionTenantCommand

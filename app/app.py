@@ -15,6 +15,7 @@ from exception import SystemException
 from port.adapter.persistence.repository.inmem import InMemUnitOfWork, InMemUserRepository
 from port.adapter.persistence.repository.mysql import DataBase, MySQLUnitOfWork
 from port.adapter.resource.auth import auth_resource
+from port.adapter.resource.auth.github import GitHubResource
 from port.adapter.resource.health import health_resource
 from port.adapter.resource.user import user_resource
 from port.adapter.service.mail import MailDeliveryServiceImpl
@@ -56,6 +57,7 @@ app.add_middleware(
 app.include_router(auth_resource.router)
 app.include_router(health_resource.router)
 app.include_router(user_resource.router)
+app.include_router(GitHubResource(os.getenv('GITHUB_CLIENT_ID'), os.getenv('GITHUB_CLIENT_SECRET')).router)
 
 
 @app.exception_handler(SystemException)

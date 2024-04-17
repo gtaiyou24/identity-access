@@ -11,12 +11,19 @@ from domain.model.user import EmailAddress, EncryptionService
 @dataclass(init=False, eq=False)
 class User:
     _email_address: EmailAddress
-    _encrypted_password: str
+    _encrypted_password: str | None
     _tokens: set[Token]
     _enable: bool
     _verified_at: datetime | None
 
-    def __init__(self, email_address: EmailAddress, encrypted_password, tokens: set[Token], verified_at: datetime | None, enable: bool):
+    def __init__(self, email_address: EmailAddress, encrypted_password: str | None, tokens: set[Token], verified_at: datetime | None, enable: bool):
+        """
+        :param email_address:
+        :param encrypted_password: 暗号化されたパスワード。OAuth2認証で登録されたユーザーは None になる。
+        :param tokens:
+        :param verified_at:
+        :param enable:
+        """
         super().__setattr__("_email_address", email_address)
         super().__setattr__("_encrypted_password", encrypted_password)
         super().__setattr__("_tokens", tokens)
@@ -32,10 +39,10 @@ class User:
         return hash(self.email_address)
 
     @staticmethod
-    def registered(email_address: EmailAddress, plain_password: str) -> User:
+    def registered(email_address: EmailAddress, plain_password: str | None) -> User:
         return User(
             email_address,
-            DomainRegistry.resolve(EncryptionService).encrypt(plain_password),
+            DomainRegistry.resolve(EncryptionService).encrypt(plain_password) if plain_password else None,
             set(),
             None,
             False
@@ -46,7 +53,7 @@ class User:
         return self._email_address
 
     @property
-    def encrypted_password(self) -> str:
+    def encrypted_password(self) -> str | None:
         return self._encrypted_password
 
     @property
@@ -58,6 +65,8 @@ class User:
         self._email_address = value
 
     def verify_password(self, plain_password: str) -> bool:
+        if self.encrypted_password is None:
+            return False
         return DomainRegistry.resolve(EncryptionService).verify(plain_password, self.encrypted_password)
 
     def protect_password(self, plain_password) -> None:

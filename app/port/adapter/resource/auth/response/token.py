@@ -10,7 +10,7 @@ from port.adapter.resource.auth import JWTEncoder
 
 class Token(BaseModel):
     access_token: str
-    # refresh_token: str
+    refresh_token: str
     token_type: str
 
     @staticmethod
@@ -20,4 +20,8 @@ class Token(BaseModel):
             "sub": dpo.user.email_address.address,
             'exp': now + timedelta(minutes=30)
         })
-        return Token(access_token=access_token, token_type="bearer")
+        refresh_token = JWTEncoder.encode({
+            "sub": dpo.user.email_address.address,
+            'exp': now + timedelta(minutes=60)
+        })
+        return Token(access_token=access_token, refresh_token=refresh_token, token_type="bearer")

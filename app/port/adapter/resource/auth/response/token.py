@@ -18,10 +18,10 @@ class Token(BaseModel):
         now = datetime.now(timezone.utc)
         access_token = JWTEncoder.encode({
             "sub": dpo.user.email_address.address,
-            'exp': now + timedelta(minutes=30)
+            "exp": now + timedelta(days=1)
         })
         refresh_token = JWTEncoder.encode({
             "sub": dpo.user.email_address.address,
-            'exp': now + timedelta(minutes=60)
+            "exp": now + timedelta(days=30)
         })
         return Token(access_token=access_token, refresh_token=refresh_token, token_type="bearer")

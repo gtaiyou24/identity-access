@@ -161,11 +161,11 @@ class IdentityApplicationService:
 
     def reset_password(self, command: ResetPasswordCommand) -> None:
         """新しく設定したパスワードとパスワードリセットトークン指定で新しいパスワードに変更する"""
-        user = self.__user_repository.user_with_token(command.token)
-        if user is None or user.token_with(command.token).has_expired():
+        user = self.__user_repository.user_with_token(command.reset_token)
+        if user is None or user.token_with(command.reset_token).has_expired():
             raise SystemException(ErrorCode.VALID_TOKEN_DOES_NOT_EXISTS,
-                                  f'指定したトークン {command.token} は無効なのでパスワードをリセットできません。')
+                                  f'指定したトークン {command.reset_token} は無効なのでパスワードをリセットできません。')
 
-        user.reset_password(command.password, command.token)
+        user.reset_password(command.password, command.reset_token)
 
         self.__user_repository.add(user)

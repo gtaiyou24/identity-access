@@ -72,8 +72,8 @@ class User:
     def protect_password(self, plain_password) -> None:
         self._encrypted_password = DomainRegistry.resolve(EncryptionService).encrypt(plain_password)
 
-    def reset_password(self, new_plain_password: str, token: str) -> None:
-        assert self.token_with(token), 'パスワードのリセットトークンが不正です。'
+    def reset_password(self, new_plain_password: str, reset_token: str) -> None:
+        assert self.token_with(reset_token), 'パスワードのリセットトークンが不正です。'
 
         self.protect_password(new_plain_password)
         for token in self.tokens_of(Token.Name.PASSWORD_RESET):

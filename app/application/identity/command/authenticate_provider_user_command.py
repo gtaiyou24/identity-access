@@ -9,10 +9,9 @@ class AuthenticateProviderUserCommand:
 
     @staticmethod
     def github(user: dict, emails: list[dict]) -> AuthenticateProviderUserCommand:
-        email_address = user['email']
-        if email_address is None:
-            email_address = emails[0]['email']
-            for e in emails:
-                if e['primary']:
-                    email_address = e['email']
-        return AuthenticateProviderUserCommand(email_address=email_address)
+        default_email = user['email'] or emails[0]['email']
+        primary_email = None
+        for e in emails:
+            if e['primary']:
+                primary_email = e['email']
+        return AuthenticateProviderUserCommand(email_address=primary_email or default_email)

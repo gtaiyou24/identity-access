@@ -124,6 +124,7 @@ class IdentityApplicationService:
             return UserDpo(user)
 
         user = User.registered(email_address, None)
+        user.verified()
         self.__user_repository.add(user)
         return UserDpo(user)
 
